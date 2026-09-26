@@ -9,7 +9,11 @@ use std::process::Command;
 /// No persistent cache: single 0600 tempfile, unlinked promptly,
 /// fsync before edit, removed on all paths (incl. signals via Drop).
 #[derive(Parser, Debug)]
-#[command(name = "ripe", version, about = "Edit pipe content in $EDITOR, emit to stdout")]
+#[command(
+    name = "ripe",
+    version,
+    about = "Edit pipe content in $EDITOR, emit to stdout"
+)]
 struct Args {
     /// Suffix for temp file (e.g. --suffix .rs gives syntax highlighting)
     #[arg(long)]
@@ -67,7 +71,9 @@ fn main() -> Result<()> {
     // 1. Read stdin fully (empty if TTY — vipe still opens editor with empty buf).
     let mut input = Vec::new();
     if !std::io::stdin().is_terminal() {
-        std::io::stdin().read_to_end(&mut input).context("reading stdin")?;
+        std::io::stdin()
+            .read_to_end(&mut input)
+            .context("reading stdin")?;
     }
 
     // 2. Secure tempfile: 0600, O_EXCL, auto-removed. Suffix aids highlighting.
@@ -89,7 +95,10 @@ fn main() -> Result<()> {
     // If stdin is a TTY already, inherit normally. Else wire editor stdio to /dev/tty.
     let (prog, eargs) = resolve_editor(args.editor)?;
     let tty_r = std::fs::OpenOptions::new().read(true).open("/dev/tty").ok();
-    let tty_w = std::fs::OpenOptions::new().write(true).open("/dev/tty").ok();
+    let tty_w = std::fs::OpenOptions::new()
+        .write(true)
+        .open("/dev/tty")
+        .ok();
 
     let mut cmd = Command::new(&prog);
     cmd.args(&eargs).arg(&path);
@@ -107,7 +116,9 @@ fn main() -> Result<()> {
         }
     }
 
-    let status = cmd.status().with_context(|| format!("spawning editor `{}`", prog))?;
+    let status = cmd
+        .status()
+        .with_context(|| format!("spawning editor `{}`", prog))?;
 
     // 4. Editor exit semantics (vipe-compatible):
     //   exit 0  -> emit edited file to stdout
