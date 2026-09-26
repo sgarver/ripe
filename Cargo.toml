@@ -1,0 +1,12 @@
+[package]
+name = "ripe"
+version = "0.1.0"
+edition = "2021"
+description = "Secure, fast vipe clone: stdin -> $EDITOR -> stdout"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+tempfile = "3"
+is-terminal = "0.4"
